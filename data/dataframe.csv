@@ -1,4 +1,4 @@
-,locality,type_of_property,subtype_of_property,price,number_rooms,living_area,kitchen,furnished,fireplace,terrace,terrace_area,garden,garden_area,surface_land,number_facades,swimming_pool,building_state
+index,locality,type_of_property,subtype_of_property,price,number_rooms,living_area,kitchen,furnished,fireplace,terrace,terrace_area,garden,garden_area,surface_land,number_facades,swimming_pool,building_state
 0,Libin,HOUSE,HOUSE,299900.0,3.0,124.0,NOT_INSTALLED,False,,True,8.0,True,257.0,320,3,False,AS_NEW
 1,Rixensart,HOUSE,HOUSE,399000.0,3.0,173.0,SEMI_EQUIPPED,False,,True,15.0,True,333.0,428,3,False,TO_RENOVATE
 2,Rixensart Genval,HOUSE,HOUSE,485000.0,3.0,148.0,SEMI_EQUIPPED,False,,,,True,88.0,232,3,False,GOOD
