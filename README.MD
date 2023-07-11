@@ -1,10 +1,8 @@
 # Immo Eliza Data Analysis
 
-This challenge was done as a part of the BEcode AI Data Engineer bootcamp. 
+This challenge was done by Sam Hoste [![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/sam-hoste-15610945/) as a part of the BEcode AI Data Engineer bootcamp. 
 
 We will be using the data scraped in part 1 of the project (https://github.com/nikolaaswillaert/ImmoEliza)
-
-[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/sam-hoste-15610945/)
 
 ## Mission objectives
 
