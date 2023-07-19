@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from pathlib import Path
+import re
 
 def build_path():
     """Builds path to csv locations"""
@@ -18,8 +19,15 @@ def get_csv(src_path):
 
     return csv
 
+def convert(n):
+    if n == 'other':
+        return 'other'
+    else:
+        return str(int(int(n)/100))
+
 def clean_csv(csv):
     """Removes duplicates and drops rows with emtpy cells"""
+    # Removing unneeded data
     # dropping empty rows
     csv = csv.dropna(how='all')
     # dropping duplicates (if any)
@@ -70,6 +78,7 @@ def clean_csv(csv):
     csv['swimming_pool'] = csv['swimming_pool'].replace(False, 0)
     csv['swimming_pool'] = csv['swimming_pool'].replace(True, 1)
     csv = csv.drop(csv[(csv['building_state'] == 'UNKNOWN') | (pd.isna(csv['building_state']) == True)].index)
+
     # If terrace = 1 but no terrace_area present, drop the row
     csv = csv.drop(csv[(csv['terrace'] == 1) & (pd.isna(csv['terrace_area']) == True)].index)
     # Filling empty values and changing true/false to 1/0
@@ -81,11 +90,32 @@ def clean_csv(csv):
     csv['garden'] = csv['garden'].replace(False, 0)
     csv['garden'] = csv['garden'].replace(True, 1)
     csv['garden_area'] = csv['garden_area'].fillna(0)
+
     # Change strings to floats in certain columns
+    csv = csv.drop(csv[(csv['surface_land'] == 0)].index)
     csv['surface_land']=csv['surface_land'].astype("float")
     csv['number_facades']=csv['number_facades'].astype("float")
-    # Calculate price per square meter
+    csv = csv.drop(csv[csv['zip_code'] == 'UNKNOWN'].index)
+    csv = csv.drop(csv[pd.isna(csv['region']) == True].index)
+    csv = csv.drop(csv[pd.isna(csv['province']) == True].index)
+    csv['zip_code']=csv['zip_code'].astype("str")
     csv['ppm'] = csv['price']/csv['surface_land']
+    # Removing zipcodes that are not 4 numbers
+    patternDel = "\b[0-9]\{4\}\b"
+    filter = csv['zip_code'].str.contains(patternDel)
+    csv = csv[~filter]
+    # If we have less than 3 occurences, zipcode will be changed to 'other' so we don't overfit
+    filter = csv['zip_code'].value_counts()
+    csv['zip_code'] = np.where(csv['zip_code'].isin(filter.index[filter >= 4]), csv['zip_code'], 'other')
+    # Removing outliers
+    cols = ['price', 'number_rooms', 'living_area',
+        'furnished', 'fireplace', 'terrace', 'terrace_area', 'garden',
+        'garden_area', 'surface_land', 'number_facades', 'swimming_pool'] # one or more
+    Q1 = csv[cols].quantile(0.25)
+    Q3 = csv[cols].quantile(0.75)
+    IQR = Q3 - Q1
+    csv = csv[~((csv[cols] < (Q1 - 1.5 * IQR)) |(csv[cols] > (Q3 + 1.5 * IQR))).any(axis=1)]
+    csv["digit"]=csv["zip_code"].agg(convert)
 
     return csv
 
