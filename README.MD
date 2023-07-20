@@ -66,9 +66,12 @@ run main.py to train the models and see the scores.
 ### Duration
 
 I spent 2 working days on cleaning the data. 
+
 Plotting the graphs and drawing conclusions took me another 1.5 working days. 
+
 Building the initial pipeline for the model training took me an hour. 
-I then spent 4 working days on adding different regression models and optimising the training results. 
+
+I then spent the rest of the time (4 working days) on adding different regression models and optimising the training results. 
 
 ### Must-have features
 
@@ -134,5 +137,7 @@ I trained my model on my data.
 #### Step 5: Model evaluation
 
 I am getting decent results but they could be better. 
+
 Due to data scarcity on some features I'm having trouble improving it further. 
+
 I saw pretty high scores without optimisation thanks to a very clean dataset, but I did not see as much improvement by optimising as I would have expected. 
