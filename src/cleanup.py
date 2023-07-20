@@ -20,6 +20,7 @@ def get_csv(src_path):
     return csv
 
 def convert(n):
+    """Divides zipcode by 100 to generalise the data a little and prevent overfitting"""
     if n == 'other':
         return 'other'
     else:
@@ -78,7 +79,6 @@ def clean_csv(csv):
     csv['swimming_pool'] = csv['swimming_pool'].replace(False, 0)
     csv['swimming_pool'] = csv['swimming_pool'].replace(True, 1)
     csv = csv.drop(csv[(csv['building_state'] == 'UNKNOWN') | (pd.isna(csv['building_state']) == True)].index)
-
     # If terrace = 1 but no terrace_area present, drop the row
     csv = csv.drop(csv[(csv['terrace'] == 1) & (pd.isna(csv['terrace_area']) == True)].index)
     # Filling empty values and changing true/false to 1/0
@@ -90,7 +90,6 @@ def clean_csv(csv):
     csv['garden'] = csv['garden'].replace(False, 0)
     csv['garden'] = csv['garden'].replace(True, 1)
     csv['garden_area'] = csv['garden_area'].fillna(0)
-
     # Change strings to floats in certain columns
     csv = csv.drop(csv[(csv['surface_land'] == 0)].index)
     csv['surface_land']=csv['surface_land'].astype("float")

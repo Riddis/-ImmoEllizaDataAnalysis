@@ -1,6 +1,5 @@
 import src.cleanup as cleanup
 import src.trainmodel as trainmodel
-from sklearn.model_selection import cross_val_score
 import numpy as np
 import pandas as pd
 
@@ -17,9 +16,11 @@ cleanup.save_csv(csv, out_path)
 X_train, X_test, y_train, y_test, y = trainmodel.prep_data(csv)
 
 # Train the models
-models = [trainmodel.train_LinearRegression, trainmodel.train_DecisionTreeRegressor, trainmodel.train_XGBRegressor, trainmodel.train_SGDRegressor]
+models = [trainmodel.train_LinearRegression, trainmodel.train_DecisionTreeRegressor, trainmodel.train_XGBRegressor, trainmodel.train_SGDRegressor, trainmodel.train_NeuralNetwork]
+# Prep the score DataFrame
 total_scores = pd.DataFrame(columns=['train_score', 'test_score', 'rmse', 'coef_determination'])
 
+# Look through the different regression models
 for model in models:
     regressor = model(X_train, y_train)
     score_train, score_test, rmse, coef_determination = trainmodel.score(regressor, X_train, X_test, y_train, y_test, y)

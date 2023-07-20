@@ -129,10 +129,13 @@ After succesfully building a pipeline I also started playing with other models:
 * [DecisionTreeRegressor (scikit-learn)](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html#sklearn.tree.DecisionTreeRegressor) - Fits a set of if-else rules to the data, [read more](https://quantifyinghealth.com/regression-tree-vs-linear-regression/).
 * [XGBoost (xgboost)](https://www.geeksforgeeks.org/xgboost-for-regression/), another optimized tree based algorithm.
 * [Stochastic Gradient Descent (scikit-learn)](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDRegressor.html#sklearn.linear_model.SGDRegressor) - A different implementation of gradient descent.
+* [Neural Network (scikit-learn)](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPRegressor.html) - A neural network.
 
 #### Step 4: Train your model
 
 I trained my model on my data.
+
+The results were pretty consistent, except with the DecisionTree model. 
 
 #### Step 5: Model evaluation
 

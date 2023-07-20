@@ -2,6 +2,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeRegressor
 from xgboost import XGBRegressor
 from sklearn.linear_model import SGDRegressor
+from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
@@ -9,10 +10,11 @@ import numpy as np
 import pandas as pd
 
 def prep_data(csv):
+    """Select which columns to use as features, split the dataset, and scale it"""
     x = csv[['number_rooms', 'living_area',
        'terrace', 'terrace_area', 'garden',
        'garden_area', 'surface_land', 'number_facades',
-       'property_type', 'building_state', 'kitchen', 'region', 'digit']]
+       'property_type', 'building_state', 'kitchen', 'province', 'digit']]
 
     x = pd.get_dummies(data=x, drop_first=True)
     X = x.to_numpy()
@@ -42,7 +44,12 @@ def train_SGDRegressor(X_train, y_train):
     """Initializes the model"""
     return SGDRegressor(max_iter=1000, tol=1e-3).fit(X_train, y_train)
 
+def train_NeuralNetwork(X_train, y_train): 
+    """Initializes the model"""
+    return MLPRegressor(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1, max_iter=10000).fit(X_train, y_train)
+
 def score(regressor, X_train, X_test, y_train, y_test, y):
+    """Calculates and returns several score metrics (score, rmse, coefficient)"""
     score_train = regressor.score(X_train, y_train)
     score_test = regressor.score(X_test, y_test)
 
