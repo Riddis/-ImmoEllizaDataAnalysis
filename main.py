@@ -1,10 +1,8 @@
 import src.cleanup as cleanup
-import src.train_model as train_model
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import MinMaxScaler
+import src.trainmodel as trainmodel
 from sklearn.model_selection import cross_val_score
 import numpy as np
+import pandas as pd
 
 # Get path variables
 src_path, out_path = cleanup.build_path()
@@ -14,37 +12,23 @@ csv = cleanup.get_csv(src_path)
 csv = cleanup.clean_csv(csv)
 # Save the csv
 cleanup.save_csv(csv, out_path)
-#csv = cleanup.get_csv(out_path)
 
-# Prepare data, filter out columns
-X, y = train_model.prep_data_categorical(csv)
+# Prepare data, filter out columns, split dataset, scale dataset
+X_train, X_test, y_train, y_test, y = trainmodel.prep_data(csv)
 
-# Split the data into test and training sets and scale it
-X_train, X_test, y_train, y_test = train_test_split(X, y)
-scaler = MinMaxScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
+# Train the models
+models = [trainmodel.train_LinearRegression, trainmodel.train_DecisionTreeRegressor, trainmodel.train_XGBRegressor, trainmodel.train_SGDRegressor]
+total_scores = pd.DataFrame(columns=['train_score', 'test_score', 'rmse', 'coef_determination'])
 
-# Train the model
-regressor = train_model.train_LR(X_train, y_train)
+for model in models:
+    regressor = model(X_train, y_train)
+    score_train, score_test, rmse, coef_determination = trainmodel.score(regressor, X_train, X_test, y_train, y_test, y)
+    score = {}
+    score['train_score'] = score_train
+    score['test_score'] = score_test
+    score['rmse'] = rmse
+    score['coef_determination'] = coef_determination
+    total_scores = total_scores._append(score, ignore_index=True)
 
-# Get the model score
-"""score_train = cross_val_score(regressor, X_train, y_train, cv=10)
-score_test = cross_val_score(regressor, X_test, y_test, cv=10)"""
-score_train = regressor.score(X_train, y_train)
-score_test = regressor.score(X_test, y_test)
-
-
-# Get the root mean squared error
-y_pred = regressor.predict(X_test)
-rmse= np.sqrt(mean_squared_error(y_true=y_test, y_pred=y_pred))
-
-# Calculate the coefficient determination (how well did our model do?)
-coef_determination = train_model.coef_determination(y_test, y_pred)
-
-print(f"score train:{score_train}")
-print(f"score test:{score_test}")
-print(f"rmse:{rmse}")
-print(f"coef_determination:{coef_determination}")
-
-
+total_scores.index = [(str(model).rsplit("_")[1]).split(" ")[0] for model in models]
+print(total_scores)
