@@ -3,7 +3,7 @@ from sklearn.tree import DecisionTreeRegressor
 from xgboost import XGBRegressor
 from sklearn.linear_model import SGDRegressor
 from sklearn.neural_network import MLPRegressor
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -16,7 +16,8 @@ def prep_data(csv):
        'garden_area', 'surface_land', 'number_facades',
        'property_type', 'building_state', 'kitchen', 'province', 'digit']]
 
-    x = pd.get_dummies(data=x, drop_first=True)
+    encoder = OneHotEncoder()
+    x = encoder.fit(x)
     X = x.to_numpy()
     y = csv['price'].to_numpy() 
 
@@ -26,7 +27,7 @@ def prep_data(csv):
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
 
-    return X_train, X_test, y_train, y_test, y
+    return X_train, X_test, y_train, y_test, y, scaler, encoder
 
 def train_LinearRegression(X_train, y_train): 
     """Initializes the model"""
