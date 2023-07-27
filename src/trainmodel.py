@@ -11,15 +11,16 @@ import pandas as pd
 
 def prep_data(csv):
     """Select which columns to use as features, split the dataset, and scale it"""
-    x = csv[['number_rooms', 'living_area',
-       'terrace', 'terrace_area', 'garden',
-       'garden_area', 'surface_land', 'number_facades',
-       'property_type', 'building_state', 'kitchen', 'province', 'digit']]
-
-    encoder = OneHotEncoder()
-    x = encoder.fit(x)
-    X = x.to_numpy()
     y = csv['price'].to_numpy() 
+
+    cat_cols = ['property_type','kitchen','building_state','province', 'digit']
+    numerical_cols = ['number_rooms', 'living_area', 'surface_land', 'number_facades', 'terrace', 'terrace_area', 'garden', 'garden_area']
+
+    encoder = OneHotEncoder(handle_unknown='ignore')
+    encoded_data = encoder.fit_transform(csv[cat_cols])
+    onehotdata = pd.DataFrame(encoded_data.toarray(), columns=encoder.get_feature_names_out(cat_cols))
+
+    X = np.hstack([csv[numerical_cols], onehotdata])
 
     # Split the data into test and training sets and scale it
     X_train, X_test, y_train, y_test = train_test_split(X, y)

@@ -2,7 +2,7 @@ import src.cleanup as cleanup
 import src.trainmodel as trainmodel
 import numpy as np
 import pandas as pd
-from sklearn.externals import joblib
+import joblib
 
 # Get path variables
 src_path, out_path = cleanup.build_path()
@@ -41,11 +41,3 @@ for model in models:
 
 total_scores.index = [(str(model).rsplit("_")[1]).split(" ")[0] for model in models]
 print(total_scores)
-
-
-
-
-
-
-# And now to load...
-

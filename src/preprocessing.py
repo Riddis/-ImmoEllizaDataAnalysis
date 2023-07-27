@@ -1,9 +1,15 @@
 from jsonschema import validate
 from jsonschema import Draft202012Validator
 import pandas as pd
-from sklearn.externals import joblib
 
-def preprocess_new_data(json_data):
+def convert(n):
+    """Divides zipcode by 100 to generalise the data a little and prevent overfitting"""
+    if n == 'other':
+        return 'other'
+    else:
+        return str(int(int(n)/100))
+
+def preprocess_new_data(json_data, encoder, scaler):
     
     json_schema = {
         "type" : "object",
@@ -61,21 +67,35 @@ def preprocess_new_data(json_data):
     df = pd.read_json(json_data)
     df = pd.data
 
+    # rename colums
+    df.rename(columns ={"area": "living_area", 
+                        "property-type": "property_type", 
+                        'rooms-number':'number_rooms', 
+                        'zip-code':'digit', 
+                        'land-area': 'surface_land', 
+                        'garden-area':'garden_area', 
+                        'equipped-kitchen':'kitchen', 
+                        'terrace-area':'terrace_area', 
+                        'facades-number':'number_facades', 
+                        'building-state':'building_state'})
+                        
+    csv["digit"]=csv["zip_code"].agg(convert)
 
-    'number_rooms', 'living_area',
-    'terrace', 'terrace_area', 'garden',
-    'garden_area', 'surface_land', 'number_facades',
-    'property_type', 'building_state', 'kitchen', 'province', 'digit'
+    cat_cols = ['property_type','kitchen','building_state','province', 'digit']
+    numerical_cols = ['number_rooms', 'living_area', 'surface_land', 'number_facades', 'terrace', 'terrace_area', 'garden', 'garden_area']
 
-    encoder = joblib.load("models/encoder.save")
-    scaler = joblib.load("models/scaler.save") 
+    encoder = OneHotEncoder(handle_unknown='ignore')
+    encoded_data = encoder.fit_transform(df[cat_cols])
+    onehotdata = pd.DataFrame(encoded_data.toarray(), columns=encoder.get_feature_names_out(cat_cols))
 
-    X = pd.to_numpy()
-    X = encoder.transform(df)
+    X = np.hstack([csv[numerical_cols], onehotdata])
+
     X = scaler.transform(X)
 
     status = 200
     return X, status
+
+
 
 
 
@@ -149,3 +169,4 @@ encoder = joblib.load("models/encoder.save")
                         terrace_area:bool = None,
                         number_facades:int = None,
                         building_state:str = None)"""'''
+
