@@ -40,7 +40,7 @@ async def root():
 async def predict(json_data: dict):
     encoder = joblib.load('models/encoder.save')
     scaler = joblib.load('models/scaler.save')
-    print('Preprocessing data')
+
     df, status = preprocess_new_data(json_data, encoder, scaler)
 
     if status != 200:
@@ -48,7 +48,6 @@ async def predict(json_data: dict):
                 'status_code': status}
         return json.dumps(dict) 
     
-    print('Predicting')
     model = XGBRegressor()
     model.load_model('models/xgbmodel.model')
     prediction = model.predict(df)
