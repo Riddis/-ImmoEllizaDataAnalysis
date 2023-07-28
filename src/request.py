@@ -12,15 +12,14 @@ data = {
         "land-area": 200,
         "garden": 1,
         "garden-area": 50,
-        "equipped-kitchen": 'NOT_INSTALLED',
+        "equipped-kitchen": 'NOT_INSTAlLED',
         "terrace": 1,
         "terrace-area": 20,
         "facades-number": 4,
-        "building-state": "NEW"
+        "building-state": "NEW",
+        "province": "East Flanders"
   }
 }
-print(type(data))
-#data = json.dumps(data)
-print(type(data))
-response = requests.post(url, json=data['data'])
+
+response = requests.post(url, json=data)
 print(response.text)

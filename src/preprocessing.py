@@ -1,6 +1,7 @@
 from jsonschema import validate
-from jsonschema import Draft202012Validator
+from jsonschema.exceptions import ValidationError
 import pandas as pd
+import numpy as np
 
 def convert(n):
     """Divides zipcode by 100 to generalise the data a little and prevent overfitting"""
@@ -29,8 +30,31 @@ def preprocess_new_data(json_data, encoder, scaler):
                     "land-area": {type: "integer"},
                     "garden": {type: "boolean"},
                     "garden-area": {type: "integer"},
-                    "equipped-kitchen": {type: "string"},
-                    "full-address": {type: "string"},
+                    "equipped-kitchen": {
+                        type: "string",
+                        "enum": ['NOT_INSTALLED', 
+                                 'USA_UNINSTALLED', 
+                                 'SEMI_EQUIPPED', 
+                                 'USA_SEMI_EQUIPPED', 
+                                 'INSTALLED', 
+                                 'USA_INSTALLED',
+                                 'HYPER_EQUIPPED', 
+                                 'USA_HYPER_EQUIPPED'],
+                    },
+                    "province": {
+                        type: "string",
+                        "enum": ['Antwerp', 
+                                 'Brussels', 
+                                 'East Flanders', 
+                                 'West Flanders', 
+                                 'Flemish Brabant', 
+                                 'Hainaut',
+                                 'Liège', 
+                                 'Limburg', 
+                                 'Luxembourg', 
+                                 'Namur', 
+                                 'Waloon Brabant']
+                     },
                     "swimming-pool": {type: "boolean"},
                     "furnished": {type: "boolean"},
                     "open-fire": {type: "boolean"},
@@ -57,38 +81,67 @@ def preprocess_new_data(json_data, encoder, scaler):
         "additionalProperties": False
     }
 
-    if validate(instance=json_data, schema=json_schema) == False:
-        v = Draft202012Validator(json_schema)
+    try:
+        validate(instance=json_data, schema=json_schema)
+    except ValidationError as error: 
+        status = 400
+        return error, status
+        
+
+
+
+        """    v = Draft202012Validator(json_schema)
         errors = sorted(v.iter_errors(json_data), key=str)
         status = 400
 
-        return errors, status
+        return errors, status"""
+
     
-    df = pd.read_json(json_data)
-    df = pd.data
+    data = {}
+    for key, value in json_data['data'].items():
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                data[sub_key] = sub_value
+        else:
+            data[key] = value
+
+    df = pd.DataFrame(data, index=[0])
+ 
 
     # rename colums
-    df.rename(columns ={"area": "living_area", 
-                        "property-type": "property_type", 
-                        'rooms-number':'number_rooms', 
-                        'zip-code':'digit', 
-                        'land-area': 'surface_land', 
-                        'garden-area':'garden_area', 
-                        'equipped-kitchen':'kitchen', 
-                        'terrace-area':'terrace_area', 
-                        'facades-number':'number_facades', 
-                        'building-state':'building_state'})
-                        
-    csv["digit"]=csv["zip_code"].agg(convert)
+    df = df.reset_index().rename(columns ={"area": "living_area", 
+                                            "property-type": "property_type", 
+                                            'rooms-number':'number_rooms', 
+                                            'zip-code':'digit', 
+                                            'land-area': 'surface_land', 
+                                            'garden-area':'garden_area', 
+                                            'equipped-kitchen':'kitchen', 
+                                            'terrace-area':'terrace_area', 
+                                            'facades-number':'number_facades', 
+                                            'building-state':'building_state'})
 
-    cat_cols = ['property_type','kitchen','building_state','province', 'digit']
-    numerical_cols = ['number_rooms', 'living_area', 'surface_land', 'number_facades', 'terrace', 'terrace_area', 'garden', 'garden_area']
+    df["digit"]=df["digit"].agg(convert)
+    df = df.drop(columns='index')
 
-    encoder = OneHotEncoder(handle_unknown='ignore')
-    encoded_data = encoder.fit_transform(df[cat_cols])
+    cat_cols = ['property_type',
+                'kitchen',
+                'building_state',
+                'province', 
+                'digit']
+    
+    numerical_cols = ['number_rooms', 
+                      'living_area', 
+                      'surface_land', 
+                      'number_facades', 
+                      'terrace', 
+                      'terrace_area', 
+                      'garden', 
+                      'garden_area']
+
+    encoded_data = encoder.transform(df[cat_cols])
     onehotdata = pd.DataFrame(encoded_data.toarray(), columns=encoder.get_feature_names_out(cat_cols))
 
-    X = np.hstack([csv[numerical_cols], onehotdata])
+    X = np.hstack([df[numerical_cols], onehotdata])
 
     X = scaler.transform(X)
 
