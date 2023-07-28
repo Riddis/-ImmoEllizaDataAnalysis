@@ -45,6 +45,7 @@ Install dependencies
 ![Static Badge](https://img.shields.io/badge/Requests-red)
 ![Static Badge](https://img.shields.io/badge/scikit_learn-orange)
 ![Static Badge](https://img.shields.io/badge/xgboost-yellow)
+![Static Badge](https://img.shields.io/badge/uvicorn-purple)
 
 You can run the following code to easily install all requirements: 
 
@@ -54,7 +55,15 @@ You can run the following code to easily install all requirements:
 
 Open the notebook for the analyses.
 
-run main.py to train the models and see the scores.
+Run main.py to train the models and see the scores.
+
+To start the API locally, run the following code in your terminal:
+
+```bash
+  pip install -r requirements.txt
+```
+
+You can then either run src/request.py or go to http://127.0.0.1:8000/docs to get a prediction from the model. 
 
 ### Duration
 

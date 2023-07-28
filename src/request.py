@@ -12,7 +12,7 @@ data = {
         "land-area": 200,
         "garden": 1,
         "garden-area": 50,
-        "equipped-kitchen": 'NOT_INSTAlLED',
+        "equipped-kitchen": "NOT_INSTALLED",
         "terrace": 1,
         "terrace-area": 20,
         "facades-number": 4,
